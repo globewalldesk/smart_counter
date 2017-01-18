@@ -15,7 +15,7 @@ def s_to_ms(secs)
   return "#{secs.round(1).to_s}s" if secs < 60
   mins = (secs / 60).floor # rounds down
   secs = secs - (mins * 60)
-  return "#{mins}m#{secs.round(1)}s"
+  return "#{mins}m#{secs.round(0)}s"
 end
 
 def generate_and_display_stats
@@ -47,7 +47,7 @@ def counter(counter_running)
   end
 end
 
-system("cls")
+system("cls") || system("clear")
 puts "Welcome to Smart Counter!\n"\
 
 # enclosing loop, to start and stop review
