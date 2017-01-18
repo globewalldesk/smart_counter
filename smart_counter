@@ -1,0 +1,20 @@
+The idea behind Smart Counter is that I ought to be able to press a button after
+doing each of some task (in my case, finishing a SuperMemo question) and then
+I get various bits of feedback.
+
+The basic structure needed for the program is simple: an array of Time objects.
+Each time "enter" is pressed, current time is fetched and appended to the array.
+The program then simply spits out a series of statistics.
+
+What statistics? Well, the biggies I'm interested in are:
+# Number completed in last minute.
+# Number completed total.
+# Numbers completed in last five minutes; and in all minutes.
+# Per minute average of last five minutes.
+
+Then there are things I'd like to save, eventually (the first version needn't
+have these):
+# Daily history (going back indefinitely).
+# Start new collection/task (so I can label sessions "Ruby," "JS," etc.).
+# Pause and continue. (Not sure exactly how this should work.)
+# Delete last timestamp. (In case my finger slips.)
