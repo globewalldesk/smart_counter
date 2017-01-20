@@ -6,7 +6,11 @@ $time_at_start = ""
 $help_file =
 " \nINSTRUCTIONS:\n"\
 "After starting a counter, press <enter> to increment, or type a command.\n"\
-"Commands: (n)ew counter (h)elp (q)uit counter and quit program"
+"Commands: (n)ew counter (h)elp (q)uit program"
+$inner_help_file =
+" \nINSTRUCTIONS:\n"\
+"Press <enter> to increment, or type a command.\n"\
+"Commands: (h)elp (q)uit counter (p)ause"
 
 def save_new_time
   $times[$current_set] << Time.now
@@ -39,6 +43,22 @@ def generate_and_display_stats
     Time.now - $time_at_start < 180
 end
 
+def pause_counter
+  input = "paused"
+  pause_start = Time.now
+  until input == ''
+    print "Paused. <enter> again to continue. "
+    input = gets.chomp
+    # unpausing effectively moves the start time & all times in $times forward
+    # by the elapsed amount
+    if input == ''
+      elapsed = Time.now - pause_start
+      $time_at_start += elapsed
+      $times[$current_set].map! {|time| time += elapsed}
+    end
+  end
+end
+
 # update both times and stats endlessly
 def counter(counter_running)
   $time_at_start = Time.now
@@ -46,9 +66,21 @@ def counter(counter_running)
   while counter_running
     print $current_set.to_s + "> "
     input = gets.chomp # script pauses here
-    (counter_running = false && break) if ['q', 'Q', 'quit', "Quit", "QUIT"].include?(input)
-    save_new_time
-    generate_and_display_stats
+    case input
+    when 'q', 'Q', 'quit', "Quit", "QUIT"
+      then counter_running = false
+      break
+    when 'h', 'help', '?', 'man', 'instructions'
+      then puts $inner_help_file
+    when 'p'
+      then pause_counter
+      generate_and_display_stats
+    when ""
+      then save_new_time
+      generate_and_display_stats
+    else
+      puts "Not understood."
+    end
   end
 end
 
