@@ -1,3 +1,5 @@
+require 'Colorize'
+
 $times = {main: []} # data hash worked on and shared across all methods
 $current_set = :main # default
 $time_at_start = ""
@@ -23,14 +25,17 @@ def generate_and_display_stats
   elapsed = $times[$current_set][-2] ? $times[$current_set][-1] -
     $times[$current_set][-2] : $times[$current_set][-1] - $time_at_start
   elapsed_since_start = $times[$current_set][-1] - $time_at_start
-  puts "Elapsed: #{s_to_ms(elapsed)}. Since start: #{s_to_ms(elapsed_since_start)}."
+  print "Elapsed: #{s_to_ms(elapsed)}.".red + " Since "\
+    "start: #{s_to_ms(elapsed_since_start)}.".green + " \n"
   total_last_one_min = $times[$current_set].count {|time| Time.now - time < 60 }
   total_total = $times[$current_set].length
-  puts "1m counted: #{total_last_one_min}. Total counted: #{total_total}."
+  print "1m counted: #{total_last_one_min}.".yellow +
+    " Total counted: #{total_total}.".magenta + " \n"
   total_last_three_mins = $times[$current_set].count {|time| Time.now - time < 180 }
   three_min_avg = total_last_three_mins.to_f / 3
   total_avg = $times[$current_set].length / ((Time.now - $time_at_start) / 60)
-  puts "Avg/min, last 3m: #{three_min_avg.round(1)}. Avg/min, total: #{total_avg.round(1)}" unless
+  puts "Avg/min, last 3m: #{three_min_avg.round(1)}.".cyan +
+    " Avg/min, total: #{total_avg.round(1)}" unless
     Time.now - $time_at_start < 180
 end
 
