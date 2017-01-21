@@ -5,8 +5,8 @@ $current_set = :main # default
 $time_at_start = ""
 $help_file =
 " \nINSTRUCTIONS:\n"\
-"After starting a counter, press <enter> to increment, or type a command.\n"\
-"Commands: (n)ew counter (h)elp (q)uit program"
+"After starting a counter, press <enter> to increment.\n"\
+"Commands: <enter> to start counter (h)elp (q)uit program"
 $inner_help_file =
 " \nINSTRUCTIONS:\n"\
 "Press <enter> to increment, or type a command.\n"\
@@ -47,6 +47,7 @@ def pause_counter
   input = "paused"
   pause_start = Time.now
   until input == ''
+    puts "+++++++++++++"
     print "Paused. <enter> again to continue. "
     input = gets.chomp
     # unpausing effectively moves the start time & all times in $times forward
@@ -59,21 +60,31 @@ def pause_counter
   end
 end
 
+def delete_last
+  $times[$current_set].pop
+  puts "+++++++++++++"
+  puts "Deleted last."
+end
+
 # update both times and stats endlessly
 def counter(counter_running)
   $time_at_start = Time.now
-  puts " \nStarting new counter '#{$current_set.to_s}'. Press <enter> to increment."
+  puts " \nStarting counter '#{$current_set.to_s}'. Press <enter> to increment."
   while counter_running
     print $current_set.to_s + "> "
     input = gets.chomp # script pauses here
     case input
     when 'q', 'Q', 'quit', "Quit", "QUIT"
       then counter_running = false
+      puts "Quitting '#{$current_set}'."
       break
     when 'h', 'help', '?', 'man', 'instructions'
       then puts $inner_help_file
     when 'p'
       then pause_counter
+      generate_and_display_stats
+    when 'd'
+      then delete_last
       generate_and_display_stats
     when ""
       then save_new_time
@@ -85,7 +96,8 @@ def counter(counter_running)
 end
 
 system("cls") || system("clear")
-puts "Welcome to Smart Counter!\n"\
+puts "Welcome to Smart Counter!"
+puts "Press <enter> to begin a new counter.\n"
 
 # enclosing loop, to start and stop review
 command = ""
@@ -95,12 +107,10 @@ until ['q', 'Q', 'quit', "Quit", "QUIT"].include?(command)
   case command
   when 'h', 'help', '?', 'man', 'instructions'
     then puts $help_file
-  when 'n'
-    then counter(true)
   when 'q', 'Q', 'quit', "Quit", "QUIT"
     then puts "Goodbye!"
   when ''
-    then puts "Press 'h' for help, 'n' for a new counter."
+    then counter(true)
   else
     puts "Not understood."
   end
