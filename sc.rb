@@ -1,18 +1,20 @@
 require 'Colorize'
 
-$times = {main: []} # data hash worked on and shared across all methods
+$times = {} # data hash worked on and shared across all methods
 $current_set = :main # default
 $time_at_start = ""
 $help_file =
 " \nINSTRUCTIONS:\n"\
 "After starting a counter, press <enter> to increment.\n"\
-"Commands: <enter> to start counter (h)elp (q)uit program"
+"Commands: <enter> to start counter (h)elp (q)uit program\n"\
+"(s)witch counter"
 $inner_help_file =
 " \nINSTRUCTIONS:\n"\
 "Press <enter> to increment, or type a command.\n"\
 "Commands: (h)elp (q)uit counter (p)ause"
 
 def save_new_time
+  $times[$current_set] ||= []
   $times[$current_set] << Time.now
 end
 
@@ -95,6 +97,21 @@ def counter(counter_running)
   end
 end
 
+def switch_counter
+  input = ""
+  loop do
+    print "Enter name of counter: "
+    input = gets.chomp
+    if input.split(//).all? { |let| [*('A'..'Z'), *('a'..'z')].join.include?(let) }
+      $current_set = input.to_sym
+      puts "Switched to #{$current_set}."
+      break
+    else
+      puts "Only letters, please."
+    end
+  end
+end
+
 system("cls") || system("clear")
 puts "Welcome to Smart Counter!"
 puts "Press <enter> to begin a new counter.\n"
@@ -109,6 +126,8 @@ until ['q', 'Q', 'quit', "Quit", "QUIT"].include?(command)
     then puts $help_file
   when 'q', 'Q', 'quit', "Quit", "QUIT"
     then puts "Goodbye!"
+  when 's'
+    then switch_counter
   when ''
     then counter(true)
   else
