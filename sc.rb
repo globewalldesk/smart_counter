@@ -1,4 +1,5 @@
 require 'Colorize'
+require 'yaml'
 
 $times = {} # data hash worked on and shared across all methods
 $current_set = :main # default
@@ -16,6 +17,7 @@ $inner_help_file =
 def save_new_time
   $times[$current_set] ||= []
   $times[$current_set] << Time.now
+  # save to YAML file here (not done yet)
 end
 
 # seconds to minutes-and-seconds, returns strings of form "43s", "4m32s"
@@ -70,11 +72,13 @@ end
 
 # update both times and stats endlessly
 def counter(counter_running)
+  # first load existing data from yaml file; might need to prompt the user, or
+  # to accept a param on the command line here, to clear old data. (not done yet)
   $time_at_start = Time.now
   puts " \nStarting counter '#{$current_set.to_s}'. Press <enter> to increment."
   while counter_running
     print $current_set.to_s + "> "
-    input = gets.chomp # script pauses here
+    input = gets.chomp
     case input
     when 'q', 'Q', 'quit', "Quit", "QUIT"
       then counter_running = false
@@ -87,7 +91,7 @@ def counter(counter_running)
       generate_and_display_stats
     when 'd'
       then delete_last
-      generate_and_display_stats
+      generate_and_display_stats unless $times[$current_set].length == 0
     when ""
       then save_new_time
       generate_and_display_stats
@@ -97,11 +101,16 @@ def counter(counter_running)
   end
 end
 
-def switch_counter
+def switch_counter(*argument)
   input = ""
   loop do
-    print "Enter name of counter: "
-    input = gets.chomp
+    if argument[0]
+      input = argument[0]
+      argument = nil
+    else
+      print "Enter name of counter: "
+      input = gets.chomp
+    end
     if input.split(//).all? { |let| [*('A'..'Z'), *('a'..'z')].join.include?(let) }
       $current_set = input.to_sym
       puts "Switched to #{$current_set}."
@@ -116,18 +125,26 @@ system("cls") || system("clear")
 puts "Welcome to Smart Counter!"
 puts "Press <enter> to begin a new counter.\n"
 
+def parse(input)
+  return "" if input == ""
+  return input[0] if input.split(" ")[0] == input
+  input = input.split(" ")
+  return input[0], input[1]
+end
+
 # enclosing loop, to start and stop review
 command = ""
 until ['q', 'Q', 'quit', "Quit", "QUIT"].include?(command)
   print "=> "
   command = gets.chomp
+  command, argument = parse(command)
   case command
   when 'h', 'help', '?', 'man', 'instructions'
     then puts $help_file
   when 'q', 'Q', 'quit', "Quit", "QUIT"
     then puts "Goodbye!"
   when 's'
-    then switch_counter
+    then switch_counter(argument)
   when ''
     then counter(true)
   else
